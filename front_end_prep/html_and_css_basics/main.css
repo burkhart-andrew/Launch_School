@@ -1,0 +1,29 @@
+/*===============
+  HEADING COLORS
+  ===============*/
+h1 {
+	color: cadetblue;
+}
+
+#ingredients {
+	color: darkslategrey;
+}
+
+#directions {
+	color: maroon;
+}
+/*===============
+  FONT
+  ===============*/
+body {
+	font-size: 20px;
+	color: #666666;
+}
+
+.ingredient {
+	font-style: italic;
+}
+
+.direction {
+	font-family: sans-serif;
+}
