@@ -8,14 +8,14 @@
 ###################
 # METHODS
 ###################
-
+# makes fancy rocket
 def prompt(message)
   puts "=> #{message}"
 end
 
 # collecting user name
 def get_name()
-  prompt "Welcome to Calculator! Please enter your name:"
+  prompt 'Welcome to Calculator! Please enter your name:'
   name = gets.chomp
   loop do
     if name.empty?
@@ -39,35 +39,14 @@ def float?(input)
 end
 
 # collecting user number input
-def collect_num(instance)
+def get_user_input(p)
   loop do
-  prompt "Please enter the #{instance} number:"
-  number = gets.chomp
-    if number?(number) == nil
-      prompt "Hmm... that doesn't look like a valid number"
-    else
-      return number.to_f
-      break
-    end
-  end
-end
-
-# collecting user operator selection
-def get_operator()
-  operator_prompt = <<-MSG
-  Please enter the number of the operator you would like to perform:
-  1) add
-  2) subtract
-  3) multiply
-  4) divide
-  MSG
-  prompt operator_prompt
-  loop do
-    operator = gets.chomp
-      if /[1-4]/.match(operator) == nil
-        prompt "#{name} that's not a valid operator. Please choose 1, 2, 3, 4."
+    prompt p
+    var = gets.chomp
+      if number?(var) == nil
+        prompt 'Invalid choice. Please try again.'
       else
-        return operator
+        return var
         break
       end
   end
@@ -92,13 +71,13 @@ end
 def operation_to_message(operator)
   case operator
   when '1'
-    "Adding"
+    'Adding'
   when '2'
-    "Subtracting"
+    'Subtracting'
   when '3'
-    "Multiplying"
+    'Multiplying'
   when '4'
-    "Dividing"
+    'Dividing'
   end
 end
 
@@ -114,15 +93,33 @@ prompt "Hello #{name}! Lets tackle those calculations now."
 
 # main loop
 loop do
-  # collecting user numbers
-  number_1 = ''
-  number_1 = collect_num("first")
-  number_2 = ''
-  number_2 = collect_num("second")
+  # prompting user number input
+  number_1 = get_user_input('Please enter the first number:').to_f
+  number_2 = get_user_input('Please enter the second number:').to_f
 
- # obtaining user selected operator
- operator = get_operator
- result = calculate(operator, number_1, number_2)
+  # prompt for operator
+  operator_prompt = <<-MSG
+  Please enter the number of the operator you would like to perform:
+  1) add
+  2) subtract
+  3) multiply
+  4) divide
+  MSG
+  prompt operator_prompt
+
+  # prompting for user operator
+  operator = ''
+  loop do
+    operator = get_user_input("Please select the operator 1-4:")
+    if operator.to_i >= 1 && operator.to_i <= 4
+      break
+    else
+      prompt "#{name} that's not a valid operator. Please choose 1, 2, 3, 4."
+    end
+  end
+
+  # completeing intense math calculations
+  result = calculate(operator, number_1, number_2)
 
   # summary of operation and numbers
   prompt "#{operation_to_message(operator)} #{number_1} and #{number_2}..."
