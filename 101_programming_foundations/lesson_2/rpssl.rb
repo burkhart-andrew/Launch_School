@@ -1,9 +1,25 @@
 # Rock Paper Scissors Spock Lizard
 
 VALID_CHOICE = %w(rock paper scissors spock lizard)
-WINNING_COMBOS = { 'rock' => ['scissors', 'lizard'], 'paper' => ['rock', 'spock'], 'scissors' => ['lizard', 'paper'], 'spock' => ['rock', 'scissors'], 'lizard' => ['paper', 'spock'] }
-CHOICE_COMBOS = {}
-SAYING_COMBOS = { ['scissors', 'paper'] => 'Scissors cuts Paper', 2: 'Paper covers Rock', 3: 'Rock crushes Lizard', 4: 'Lizard poisons Spock', 5: 'Spock smashes Scissors', 6: 'Scissors decapitates Lizard', 7: 'Lizard eats Paper', 8: 'Paper disproves Spock', 9: 'Spock vaporizes Rock', 10: 'Rock crushes Scissors' }
+WINNING_COMBOS = { 
+  'rock' => ['scissors', 'lizard'], 
+  'paper' => ['rock', 'spock'], 
+  'scissors' => ['lizard', 'paper'], 
+  'spock' => ['rock', 'scissors'], 
+  'lizard' => ['paper', 'spock'] }
+
+
+SAYING_COMBOS = { 
+  ['paper', 'scissors'] => 'Scissors cuts Paper', 
+  ['paper', 'rock'] => 'Paper covers Rock', 
+  ['lizard', 'rock'] => 'Rock crushes Lizard', 
+  ['lizard', 'spock'] => 'Lizard poisons Spock', 
+  ['scissors', 'spock'] => 'Spock smashes Scissors', 
+  ['lizard', 'scissors'] => 'Scissors decapitates Lizard', 
+  ['lizard', 'paper'] => 'Lizard eats Paper', 
+  ['paper', 'spock']  => 'Paper disproves Spock', 
+  ['rock', 'spock'] => 'Spock vaporizes Rock', 
+  ['rock', 'scissors']=> 'Rock crushes Scissors' }
 
 def prompt(message)
   puts "=> #{message}"
@@ -47,66 +63,94 @@ end
 
 def battle(user, computer) # displays if the user or computer wins
   if win?(user, computer)
-    return 1
+    return :user_wins
   elsif win?(computer, user)
-    return 2
+    return :computer_wins
   else
-    return 3
+    return :draw
   end
 end
 
-def display_results(battle_method)
+def display_results(battle_method) # displays who won
   case battle_method
-  when 1
+  when :user_wins
     prompt("*****************************************************")
     prompt 'You win!'
-  when 2
+  when :computer_wins
     prompt("*****************************************************")
     prompt 'Computer wins!'
-  when 3
+  when :draw
     prompt("*****************************************************")
     prompt "It's a draw!"
   end
 end
 
-def display_saying(user, computer)
-
+def display_saying(result, user, computer) # displays game saying
+  case result
+  when :user_wins
+    arr = [user, computer]
+    arr.sort!
+    prompt("*****************************************************")
+    prompt SAYING_COMBOS.fetch(arr)
+  when :computer_wins
+    arr = [user, computer]
+    arr.sort!
+    prompt("*****************************************************")
+    prompt SAYING_COMBOS.fetch(arr)
+  when :draw
+    prompt("*****************************************************")
+    prompt "No winner!"
+  end
 end
-game_score = { user: 0, computer: 0 }
 
-def display_score(user_name, score)
+game_score = { user: 0, computer: 0, draws: 0 }
+
+def display_score(user_name, score) # display current game score
   prompt("*****************************************************")
-  prompt("#{user_name}: #{score[:user]} | Computer: #{score[:computer]}")
+  prompt("#{user_name}: #{score[:user]} | Computer: #{score[:computer]}| Draws: #{score[:draws]}")
   prompt("*****************************************************")
 end
 
-def update_score(battle_method, game_score)
-  if battle_method == 1
+def update_score(battle_method, game_score) # updates current game score
+  if battle_method == :user_wins
     game_score[:user] += 1
-  elsif battle_method == 2
+  elsif battle_method == :computer_wins
     game_score[:computer] += 1
+  else battle_method == :draw
+    game_score[:draws] += 1
   end
 end
 
 round_number = 1
-def display_round(r)
+def display_round(r) # displays current round in game
   prompt("Round #{r}")
 end
 
 # Welcome and collect name
-prompt "Welcome to Rock Paper Scissors Spock Lizard!"
+prompt "Welcome to Rock, Paper, Scissors, Spock, Lizard!"
 name = collect_input('Please enter your name:')
 prompt('Get ready for a fight!')
+prompt('First to 5 points wins it all!')
 
+# Main Loop
 loop do
   display_round(round_number)
   user_choice = user_input
   computer_choice = computer_input
   display_choices(name, user_choice, computer_choice)
   winner = battle(user_choice, computer_choice)
+  display_saying(winner, user_choice, computer_choice)
   display_results(winner)
   update_score(winner, game_score)
   display_score(name, game_score)
+  if game_score[:user] == 5
+    prompt "#{name} you are the CHAMPION of Rock, Paper, Scissors, Spock, Lizard!"
+    break
+  end
+  if game_score[:computer] == 5
+    prompt "#{name} looks like you have lost this battle. Try again another day."
+    break
+  end
   answer = collect_input("#{name} would you like to go another round?")
   round_number += 1
   break unless answer.downcase.start_with?('y')
@@ -114,4 +158,4 @@ end
 # End Main Loop
 
 # Good Bye!
-prompt "Thank you #{name} for playing VALID_CHOICE! Good Bye!"
+prompt "Thank you #{name} for playing Rock, Paper, Scissors, Spock, Lizard! Good Bye!"
