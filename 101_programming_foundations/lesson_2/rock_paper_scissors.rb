@@ -48,35 +48,35 @@ def computer_choice
   end
 end
 
-def user_vs_computer(user_choice, computer_choice, n)
-  case user_choice
+def user_vs_computer(u_c, c_c, n)
+  case u_c
   when 'rock'
-    if computer_choice == 'rock'
+    if c_c == 'rock'
       prompt 'Draw!'
-    elsif computer_choice == 'paper'
+    elsif c_c == 'paper'
       prompt 'Paper covers Rock. Computer wins!'
       return 1
-    elsif computer_choice == 'scissors'
+    elsif c_c == 'scissors'
       prompt "Rock breaks Scissors. #{n} wins!"
       return 2
     end
   when 'paper'
-    if computer_choice == 'rock'
+    if c_c == 'rock'
       prompt "Paper covers Rock. #{n} wins!"
       return 2
-    elsif computer_choice == 'paper'
+    elsif c_c == 'paper'
       prompt 'Draw!'
-    elsif computer_choice == 'scissors'
+    elsif c_c == 'scissors'
       prompt 'Scissors cuts Paper. Computer wins!'
       return 1
     end
   when 'scissors'
-    if computer_choice == 'rock'
+    if c_c == 'rock'
       prompt 'Rock breaks Scissors. Computer wins!'
       return 1
-    elsif computer_choice == 'scissors'
+    elsif c_c == 'scissors'
       prompt 'Draw!'
-    elsif computer_choice == 'paper'
+    elsif c_c == 'paper'
       prompt "Scissors cuts Paper. #{n} wins!"
       return 2
     end
@@ -86,26 +86,26 @@ end
 user_score = 0
 computer_score = 0
 
-def display_score(name, game_score)
+def display_score(n, game_score)
   prompt("*****************************************************")
-  prompt("#{name}: #{game_score[:user]} | Computer: #{game_score[:computer]}")
+  prompt("#{n}: #{game_score[:user]} | Computer: #{game_score[:computer]}")
   prompt("*****************************************************")
 end
 
 game_score = {:user => 0, :computer => 0}
 
-def update_score(winner, game_score)
-  if winner == 2
+def update_score(w, game_score)
+  if w == 2
     game_score[:user] += 1
-  elsif winner == 2
+  elsif w == 2
     game_score[:user] += 1
-  elsif winner == 2
+  elsif w == 2
     game_score[:user] += 1
-  elsif winner == 1
+  elsif w == 1
     game_score[:computer] += 1
-  elsif winner == 1
+  elsif w == 1
     game_score[:computer] += 1
-  elsif winner == 1
+  elsif w == 1
     game_score[:computer] += 1
   end
 end
@@ -123,7 +123,7 @@ prompt('Get ready for a fight!')
 # Main Loop
 loop do
   display_round(r)
-  display_score(name, game_score)
+  display_score(n, game_score)
   user_choice = user_input
   winner = user_vs_computer(user_choice, computer_choice, name)
   update_score(winner, game_score)
