@@ -1,25 +1,24 @@
 # Rock Paper Scissors Spock Lizard
 
 VALID_CHOICE = %w(rock paper scissors spock lizard)
-WINNING_COMBOS = { 
-  'rock' => ['scissors', 'lizard'], 
-  'paper' => ['rock', 'spock'], 
-  'scissors' => ['lizard', 'paper'], 
-  'spock' => ['rock', 'scissors'], 
-  'lizard' => ['paper', 'spock'] }
+WINNING_COMBOS = {
+  'rock' => %w(scissors lizard),
+  'paper' => %w(rock spock),
+  'scissors' => %w(lizard paper),
+  'spock' => %w(rock scissors),
+  'lizard' => %w(paper spock) }
 
-
-SAYING_COMBOS = { 
-  ['paper', 'scissors'] => 'Scissors cuts Paper', 
-  ['paper', 'rock'] => 'Paper covers Rock', 
-  ['lizard', 'rock'] => 'Rock crushes Lizard', 
-  ['lizard', 'spock'] => 'Lizard poisons Spock', 
-  ['scissors', 'spock'] => 'Spock smashes Scissors', 
-  ['lizard', 'scissors'] => 'Scissors decapitates Lizard', 
-  ['lizard', 'paper'] => 'Lizard eats Paper', 
-  ['paper', 'spock']  => 'Paper disproves Spock', 
-  ['rock', 'spock'] => 'Spock vaporizes Rock', 
-  ['rock', 'scissors']=> 'Rock crushes Scissors' }
+SAYING_COMBOS = {
+  %w(paper scissors) => 'Scissors cuts Paper',
+  %w(paper rock) => 'Paper covers Rock',
+  %w(lizard rock) => 'Rock crushes Lizard',
+  %w(lizard spock) => 'Lizard poisons Spock',
+  %w(scissors spock) => 'Spock smashes Scissors',
+  %w(lizard scissors) => 'Scissors decapitates Lizard',
+  %w(lizard paper) => 'Lizard eats Paper',
+  %w(paper spock)  => 'Paper disproves Spock',
+  %w(rock spock) => 'Spock vaporizes Rock',
+  %w(rock scissors) => 'Rock crushes Scissors' }
 
 def prompt(message)
   puts "=> #{message}"
@@ -50,7 +49,7 @@ def user_input # returns user choice
 end
 
 def computer_input # returns computer choice
-  return VALID_CHOICE.sample
+  VALID_CHOICE.sample
 end
 
 def win?(first, second) # winning combinations return true
@@ -116,7 +115,7 @@ def update_score(battle_method, game_score) # updates current game score
     game_score[:user] += 1
   elsif battle_method == :computer_wins
     game_score[:computer] += 1
-  else battle_method == :draw
+  elsif battle_method == :draw
     game_score[:draws] += 1
   end
 end
