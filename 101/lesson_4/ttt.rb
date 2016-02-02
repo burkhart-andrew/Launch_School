@@ -4,7 +4,12 @@ PLAYER_MARKER = 'X'
 COMPUTER_MARKER = 'O'
 WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + # rows
                 [[1, 4, 7], [2, 5, 8], [3, 6, 9]] + # columns
-                [[1, 5, 9], [3, 5, 7]] # diagonals
+                [[1, 5, 9], [3, 5, 7]] # diagonal
+
+player_score = 0
+
+computer_score = 0
+
 def prompt(msg)
   puts "=> #{msg}"
 end
@@ -96,6 +101,10 @@ def detect_winner(brd)
   nil
 end
 
+def display_score(player, computer)
+    puts "Player Score: #{player_score}. Computer Score: #{computer_score}"
+end
+
 loop do
   board = initialize_board # board variable
   loop do
@@ -111,8 +120,17 @@ loop do
   display_board(board)
   if someone_won?(board)
     prompt "#{detect_winner(board)} won!"
+    if detect_winner(board) == 'Player'
+      player_score += 1
+    elsif detect_winner(board) == "Computer"
+      computer_score += 1
+    end
   else
     prompt "It's a tie!"
+  end
+  prompt "Player Score: #{player_score}. Computer Score: #{computer_score}"
+  if player_score == 5 || computer_score == 5
+    break
   end
   prompt "Play again? (yes or no)"
   answer = gets.chomp
