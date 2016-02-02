@@ -31,8 +31,16 @@ def initialize_board # creating new board
   new_board
 end
 
+def joinor(array, separator = ',', word = 'or')
+  if array.count > 2
+    array.join(separator + ' ').insert(-2, word + ' ')
+  else
+    array.join(separator + ' ')
+  end
+end
+
 def player_turn(brd) # returns player answer as integer
-  prompt " What box would you like to mark (#{empty_squares(brd).join(', ')})?"
+  prompt "What box would you like to mark: #{joinor(empty_squares(brd))}?"
   answer = gets.chomp.to_i
   answer
 end
@@ -51,7 +59,7 @@ def player_answer_loop(brd) # returns player choice
     if valid_player_choice?(answer, brd)
       break answer
     else
-      prompt "Please enter a valid choice: Box (#{empty_squares(brd).join(', ')})}!"
+      prompt "Please enter a valid choice!"
     end
   end
 end
