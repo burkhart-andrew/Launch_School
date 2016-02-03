@@ -78,8 +78,13 @@ def player_place_peice!(square, brd) # marks player choice on the board
 end
 
 def computer_place_peice!(brd) # marks computer choice on the board
-  square = empty_squares(brd).sample
-  brd[square] = COMPUTER_MARKER
+  if immediate_threat(brd)
+    binding.pry
+    brd[computer_defense(brd).sample] = COMPUTER_MARKER
+  else
+    square = empty_squares(brd).sample
+    brd[square] = COMPUTER_MARKER
+  end
 end
 
 def someone_won?(brd)
@@ -101,8 +106,28 @@ def detect_winner(brd)
   nil
 end
 
+def immediate_threat(brd)
+  WINNING_LINES.each do |line|
+  if brd.values_at(line[0], line[1], line[2]).count(PLAYER_MARKER) == 2
+    return true
+  else
+    return false
+  end
+  end
+end
+
+def computer_defense(brd)
+  at_risk_line = WINNING_LINES.select do |line|
+    brd.values_at(line[0], line[1], line[2]).count(PLAYER_MARKER) == 2
+  end
+  at_risk_line.flatten!
+  square = at_risk_line & empty_squares(brd)
+  binding.pry
+  return square
+end
+
 def display_score(player, computer)
-    puts "Player Score: #{player_score}. Computer Score: #{computer_score}"
+  puts "Player Score: #{player}. Computer Score: #{computer}"
 end
 
 loop do
@@ -128,7 +153,7 @@ loop do
   else
     prompt "It's a tie!"
   end
-  prompt "Player Score: #{player_score}. Computer Score: #{computer_score}"
+  display_score(player_score, computer_score)
   if player_score == 5 || computer_score == 5
     break
   end
