@@ -73,14 +73,41 @@ def empty_squares(brd) # displays an array of empty squares
   brd.keys.select { |num| brd[num] == INITIAL_MARKER }
 end
 
+def computer_defense(brd)
+  if line_at_risk(brd).nil?
+    return nil
+  else
+    return line_has_open_square(brd)
+  end
+end
+
+def line_at_risk(brd) # returns array with at risk lines
+  lines = WINNING_LINES.select do |line|
+    brd.values_at(line[0], line[1], line[2]).count(PLAYER_MARKER) == 2 &&
+    brd.values_at(line[0], line[1], line[2]).include?(INITIAL_MARKER)
+  end
+  lines.flatten!
+end
+
+# def line_has_two_player_marks?(brd)
+#   WINNING_LINES.any? do |line|
+#     brd.values_at(line[0], line[1], line[2]).count(PLAYER_MARKER) == 2
+#   end
+# end
+
+def line_has_open_square(brd)
+  line_at_risk(brd).select do |square_id|
+    brd.values_at(square_id).include?(INITIAL_MARKER)
+  end
+end
+
 def player_place_peice!(square, brd) # marks player choice on the board
   brd[square] = PLAYER_MARKER
 end
 
-def computer_place_peice!(brd) # marks computer choice on the board
-  if immediate_threat(brd)
-    binding.pry
-    brd[computer_defense(brd).sample] = COMPUTER_MARKER
+def computer_place_peice!(brd)
+  if computer_defense(brd)
+    brd[computer_defense(brd).sample]  = COMPUTER_MARKER
   else
     square = empty_squares(brd).sample
     brd[square] = COMPUTER_MARKER
@@ -104,26 +131,6 @@ def detect_winner(brd)
     end
   end
   nil
-end
-
-def immediate_threat(brd)
-  WINNING_LINES.each do |line|
-  if brd.values_at(line[0], line[1], line[2]).count(PLAYER_MARKER) == 2
-    return true
-  else
-    return false
-  end
-  end
-end
-
-def computer_defense(brd)
-  at_risk_line = WINNING_LINES.select do |line|
-    brd.values_at(line[0], line[1], line[2]).count(PLAYER_MARKER) == 2
-  end
-  at_risk_line.flatten!
-  square = at_risk_line & empty_squares(brd)
-  binding.pry
-  return square
 end
 
 def display_score(player, computer)
