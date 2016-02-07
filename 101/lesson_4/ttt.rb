@@ -1,10 +1,10 @@
 require 'pry'
-INITIAL_MARKER = ' '
-PLAYER_MARKER = 'X'
-COMPUTER_MARKER = 'O'
+INITIAL_MARKER = ' '.freeze
+PLAYER_MARKER = 'X'.freeze
+COMPUTER_MARKER = 'O'.freeze
 WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + # rows
                 [[1, 4, 7], [2, 5, 8], [3, 6, 9]] + # columns
-                [[1, 5, 9], [3, 5, 7]] # diagonal
+                [[1, 5, 9], [3, 5, 7]].freeze # diagonal
 
 player_score = 0
 
@@ -14,7 +14,7 @@ def prompt(msg)
   puts "=> #{msg}"
 end
 
-def display_board(brd)
+def display_board(brd) # rubocop:disable Metrics/AbcSize
   system 'clear'
   puts "Player is #{PLAYER_MARKER}. Computer is #{COMPUTER_MARKER}."
   puts "     |     |     "
@@ -51,7 +51,7 @@ def player_turn(brd) # returns player answer as integer
 end
 
 def valid_player_choice?(choice, brd) # returns true if choice is valid
-  if (1..9).include?(choice) && empty_squares(brd).include?(choice)
+  if (1..9).cover?(choice) && empty_squares(brd).include?(choice)
     return true
   elsif choice == 0 || choice > 9
     return false
@@ -73,6 +73,10 @@ def empty_squares(brd) # displays an array of empty squares
   brd.keys.select { |num| brd[num] == INITIAL_MARKER }
 end
 
+def computer_cheat
+  INITIAL_MARKER[0] = '?'
+end
+
 # TODO: return space_id rather than [space_id]
 def computer_defense(brd)
   lines = strategic_lines(brd, PLAYER_MARKER)
@@ -81,6 +85,7 @@ def computer_defense(brd)
   else
     empty_squares_in_lines(brd, lines)
   end
+  computer_cheat
 end
 
 def computer_offense(brd)
@@ -91,7 +96,7 @@ end
 def strategic_lines(brd, marker_type) # returns array with at risk lines
   WINNING_LINES.select do |line|
     brd.values_at(line[0], line[1], line[2]).count(marker_type) == 2 &&
-    brd.values_at(line[0], line[1], line[2]).include?(INITIAL_MARKER)
+      brd.values_at(line[0], line[1], line[2]).include?(INITIAL_MARKER)
   end
 end
 
@@ -115,7 +120,7 @@ end
 
 def computer_place_peice!(brd)
   if computer_defense(brd)
-    brd[computer_defense(brd).sample]  = COMPUTER_MARKER
+    brd[computer_defense(brd).sample] = COMPUTER_MARKER
   else
     square = empty_squares(brd).sample
     brd[square] = COMPUTER_MARKER
@@ -145,7 +150,7 @@ def display_score(player, computer)
   puts "Player Score: #{player}. Computer Score: #{computer}"
 end
 
-if __FILE__ == $0
+if __FILE__ == $PROGRAM_NAME
   loop do
     board = initialize_board # board variable
     loop do
