@@ -137,36 +137,38 @@ def display_score(player, computer)
   puts "Player Score: #{player}. Computer Score: #{computer}"
 end
 
-loop do
-  board = initialize_board # board variable
+if __FILE__ == $0
   loop do
-    display_board(board)
-    choice = player_answer_loop(board)
-    player_place_peice!(choice, board)
-    display_board(board)
-    break if someone_won?(board) || board_full?(board)
-    computer_place_peice!(board)
-    display_board(board)
-    break if someone_won?(board) || board_full?(board)
-  end
-  display_board(board)
-  if someone_won?(board)
-    prompt "#{detect_winner(board)} won!"
-    if detect_winner(board) == 'Player'
-      player_score += 1
-    elsif detect_winner(board) == "Computer"
-      computer_score += 1
+    board = initialize_board # board variable
+    loop do
+      display_board(board)
+      choice = player_answer_loop(board)
+      player_place_peice!(choice, board)
+      display_board(board)
+      break if someone_won?(board) || board_full?(board)
+      computer_place_peice!(board)
+      display_board(board)
+      break if someone_won?(board) || board_full?(board)
     end
-  else
-    prompt "It's a tie!"
+    display_board(board)
+    if someone_won?(board)
+      prompt "#{detect_winner(board)} won!"
+      if detect_winner(board) == 'Player'
+        player_score += 1
+      elsif detect_winner(board) == "Computer"
+        computer_score += 1
+      end
+    else
+      prompt "It's a tie!"
+    end
+    display_score(player_score, computer_score)
+    if player_score == 5 || computer_score == 5
+      break
+    end
+    prompt "Play again? (yes or no)"
+    answer = gets.chomp
+    break unless answer.downcase.start_with?('y')
   end
-  display_score(player_score, computer_score)
-  if player_score == 5 || computer_score == 5
-    break
-  end
-  prompt "Play again? (yes or no)"
-  answer = gets.chomp
-  break unless answer.downcase.start_with?('y')
-end
 
-prompt "Thanks for playing Tic Tac Toe!"
+  prompt "Thanks for playing Tic Tac Toe!"
+end
