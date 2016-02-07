@@ -73,20 +73,26 @@ def empty_squares(brd) # displays an array of empty squares
   brd.keys.select { |num| brd[num] == INITIAL_MARKER }
 end
 
+# TODO: return space_id rather than [space_id]
 def computer_defense(brd)
-  if line_at_risk(brd).nil?
-    return nil
+  lines = strategic_lines(brd, PLAYER_MARKER)
+  if lines.empty?
+    nil
   else
-    return line_has_open_square(brd)
+    empty_squares_in_lines(brd, lines)
   end
 end
 
-def line_at_risk(brd) # returns array with at risk lines
-  lines = WINNING_LINES.select do |line|
-    brd.values_at(line[0], line[1], line[2]).count(PLAYER_MARKER) == 2 &&
+def computer_offense(brd)
+  lines = strategic_lines(brd, COMPUTER_MARKER)
+  empty_squares_in_lines(brd, lines)
+end
+
+def strategic_lines(brd, marker_type) # returns array with at risk lines
+  WINNING_LINES.select do |line|
+    brd.values_at(line[0], line[1], line[2]).count(marker_type) == 2 &&
     brd.values_at(line[0], line[1], line[2]).include?(INITIAL_MARKER)
   end
-  lines.flatten!
 end
 
 # def line_has_two_player_marks?(brd)
@@ -95,9 +101,11 @@ end
 #   end
 # end
 
-def line_has_open_square(brd)
-  line_at_risk(brd).select do |square_id|
-    brd.values_at(square_id).include?(INITIAL_MARKER)
+def empty_squares_in_lines(brd, lines)
+  lines.map do |line|
+    line.detect do |square_id|
+      brd.values_at(square_id).include?(INITIAL_MARKER)
+    end
   end
 end
 

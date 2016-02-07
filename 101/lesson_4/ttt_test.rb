@@ -66,8 +66,12 @@ describe "computer_defense" do
     end
 
     it "returns at risk square for a multiply threatened board" do
-      board = {1=>"X", 2=>"X", 3=>" ", 4=>"", 5=>"X", 6=>" ", 7=>" ", 8=>" ", 9=>" "}
-      assert_equal [3, 8, 9], computer_defense(board)
+      board = {
+        1=>"X", 2=>" ", 3=>"X",
+        4=>"X", 5=>"X", 6=>" ",
+        7=>" ", 8=>" ", 9=>" "
+      }
+      assert_equal [2, 6, 7, 9, 7], computer_defense(board)
     end
   end
 end
