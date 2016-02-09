@@ -73,10 +73,6 @@ def empty_squares(brd) # displays an array of empty squares
   brd.keys.select { |num| brd[num] == INITIAL_MARKER }
 end
 
-def computer_cheat
-  INITIAL_MARKER[0] = '?'
-end
-
 # TODO: return space_id rather than [space_id]
 def computer_defense(brd)
   lines = strategic_lines(brd, PLAYER_MARKER)
@@ -85,17 +81,23 @@ def computer_defense(brd)
   else
     empty_squares_in_lines(brd, lines)
   end
-  computer_cheat
 end
 
 def computer_offense(brd)
+  # binding.pry
   lines = strategic_lines(brd, COMPUTER_MARKER)
-  empty_squares_in_lines(brd, lines)
+  if brd[5] == INITIAL_MARKER
+    [5]
+  elsif lines.empty?
+    nil
+  else
+    empty_squares_in_lines(brd, lines)
+  end
 end
 
-def strategic_lines(brd, marker_type) # returns array with at risk lines
+def strategic_lines(brd, player_marker_type) # returns array with at risk lines
   WINNING_LINES.select do |line|
-    brd.values_at(line[0], line[1], line[2]).count(marker_type) == 2 &&
+    brd.values_at(line[0], line[1], line[2]).count(player_marker_type) == 2 &&
       brd.values_at(line[0], line[1], line[2]).include?(INITIAL_MARKER)
   end
 end
@@ -119,7 +121,9 @@ def player_place_peice!(square, brd) # marks player choice on the board
 end
 
 def computer_place_peice!(brd)
-  if computer_defense(brd)
+  if computer_offense(brd)
+    brd[computer_offense(brd).sample] = COMPUTER_MARKER
+  elsif computer_defense(brd)
     brd[computer_defense(brd).sample] = COMPUTER_MARKER
   else
     square = empty_squares(brd).sample
