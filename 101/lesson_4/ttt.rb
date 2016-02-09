@@ -74,7 +74,7 @@ def empty_squares(brd) # displays an array of empty squares
 end
 
 # TODO: return space_id rather than [space_id]
-def computer_defense(brd)
+def computer_defense(brd) # computer AI defense
   lines = strategic_lines(brd, PLAYER_MARKER)
   if lines.empty?
     nil
@@ -83,7 +83,7 @@ def computer_defense(brd)
   end
 end
 
-def computer_offense(brd)
+def computer_offense(brd) # computer AI offense
   lines = strategic_lines(brd, COMPUTER_MARKER)
   if brd[5] == INITIAL_MARKER
     [5]
@@ -101,13 +101,7 @@ def strategic_lines(brd, player_marker_type) # returns array with at risk lines
   end
 end
 
-# def line_has_two_player_marks?(brd)
-#   WINNING_LINES.any? do |line|
-#     brd.values_at(line[0], line[1], line[2]).count(PLAYER_MARKER) == 2
-#   end
-# end
-
-def empty_squares_in_lines(brd, lines)
+def empty_squares_in_lines(brd, lines) # returns an array of the empty squares in strategic lines
   lines.map do |line|
     line.detect do |square_id|
       brd.values_at(square_id).include?(INITIAL_MARKER)
@@ -120,7 +114,7 @@ def player_place_piece!(brd) # marks player choice on the board
   brd[square] = PLAYER_MARKER
 end
 
-def computer_place_piece!(brd)
+def computer_place_piece!(brd) # marks computer choice on the board
   if computer_offense(brd)
     brd[computer_offense(brd).sample] = COMPUTER_MARKER
   elsif computer_defense(brd)
@@ -131,15 +125,15 @@ def computer_place_piece!(brd)
   end
 end
 
-def someone_won?(brd)
+def someone_won?(brd) # returns true/false if someone has won
   !!detect_winner(brd)
 end
 
-def board_full?(brd)
+def board_full?(brd) # returns true/false if board is full
   empty_squares(brd).empty?
 end
 
-def detect_winner(brd) # itterates 
+def detect_winner(brd) # iterates through the winning line combinations in order to see if there is a winner on the board
   WINNING_LINES.each do |line|
     if brd.values_at(line[0], line[1], line[2]).count(PLAYER_MARKER) == 3
       return 'Player'
@@ -150,7 +144,7 @@ def detect_winner(brd) # itterates
   nil
 end
 
-def display_score(player, computer)
+def display_score(player, computer) # displays current score
   puts "Player Score: #{player}. Computer Score: #{computer}"
 end
 
@@ -159,39 +153,19 @@ def random_who_is_first # randomly decides who goes first
   players.sample
 end
 
-def who_is_next(brd, marker, opposite_marker) # returns true/false if player has more objects on board
-  brd.values.count(marker) > brd.values.count(opposite_marker)
-end
-
-def who_is_up(brd) # returns who is the current_player
-  if FIRST_PLAYER == :player
-    if who_is_next(brd, PLAYER_MARKER, COMPUTER_MARKER)
-      return :computer
-    else
-      return :player
-    end
+def place_pieces!(brd, current) # places pieces depending on who the current_player is
+  if current == :player
+    player_place_piece!(brd)
   else
-    if who_is_next(brd, COMPUTER_MARKER, PLAYER_MARKER)
-      return :player
-    else
-      return :computer
-    end
+    computer_place_piece!(brd)
   end
 end
 
-def place_pieces!(brd, current_player) # places pieces depending on hwo the current_player is
-  if empty_squares(brd) == [1, 2, 3, 4, 5, 6, 7, 8, 9]
-    if FIRST_PLAYER == :player
-      player_place_piece!(brd)
-    else
-      computer_place_piece!(brd)
-    end
+def next_player(current) # determines who the next player is
+  if current == :player
+    :computer
   else
-    if current_player == :player
-      player_place_piece!(brd)
-    else
-      computer_place_piece!(brd)
-    end
+    :player
   end
 end
 
@@ -199,9 +173,11 @@ if __FILE__ == $PROGRAM_NAME
   loop do
     board = initialize_board # board variable
     FIRST_PLAYER = random_who_is_first
+    current_player = FIRST_PLAYER
     loop do
       display_board(board)
-      place_pieces!(board, who_is_up(board))
+      place_pieces!(board, current_player)
+      current_player = next_player(current_player)
       display_board(board)
       break if someone_won?(board) || board_full?(board)
     end
@@ -224,6 +200,5 @@ if __FILE__ == $PROGRAM_NAME
     answer = gets.chomp
     break unless answer.downcase.start_with?('y')
   end
-
   prompt "Thanks for playing Tic Tac Toe!"
 end
