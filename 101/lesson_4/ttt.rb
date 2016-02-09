@@ -84,7 +84,6 @@ def computer_defense(brd)
 end
 
 def computer_offense(brd)
-  # binding.pry
   lines = strategic_lines(brd, COMPUTER_MARKER)
   if brd[5] == INITIAL_MARKER
     [5]
@@ -116,11 +115,12 @@ def empty_squares_in_lines(brd, lines)
   end
 end
 
-def player_place_peice!(square, brd) # marks player choice on the board
+def player_place_piece!(brd) # marks player choice on the board
+  square = player_answer_loop(brd)
   brd[square] = PLAYER_MARKER
 end
 
-def computer_place_peice!(brd)
+def computer_place_piece!(brd)
   if computer_offense(brd)
     brd[computer_offense(brd).sample] = COMPUTER_MARKER
   elsif computer_defense(brd)
@@ -139,7 +139,7 @@ def board_full?(brd)
   empty_squares(brd).empty?
 end
 
-def detect_winner(brd)
+def detect_winner(brd) # itterates 
   WINNING_LINES.each do |line|
     if brd.values_at(line[0], line[1], line[2]).count(PLAYER_MARKER) == 3
       return 'Player'
@@ -154,16 +154,54 @@ def display_score(player, computer)
   puts "Player Score: #{player}. Computer Score: #{computer}"
 end
 
+def random_who_is_first # randomly decides who goes first
+  players = [:player, :computer]
+  players.sample
+end
+
+def who_is_next(brd, marker, opposite_marker) # returns true/false if player has more objects on board
+  brd.values.count(marker) > brd.values.count(opposite_marker)
+end
+
+def who_is_up(brd) # returns who is the current_player
+  if FIRST_PLAYER == :player
+    if who_is_next(brd, PLAYER_MARKER, COMPUTER_MARKER)
+      return :computer
+    else
+      return :player
+    end
+  else
+    if who_is_next(brd, COMPUTER_MARKER, PLAYER_MARKER)
+      return :player
+    else
+      return :computer
+    end
+  end
+end
+
+def place_pieces!(brd, current_player) # places pieces depending on hwo the current_player is
+  if empty_squares(brd) == [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    if FIRST_PLAYER == :player
+      player_place_piece!(brd)
+    else
+      computer_place_piece!(brd)
+    end
+  else
+    if current_player == :player
+      player_place_piece!(brd)
+    else
+      computer_place_piece!(brd)
+    end
+  end
+end
+
 if __FILE__ == $PROGRAM_NAME
   loop do
     board = initialize_board # board variable
+    FIRST_PLAYER = random_who_is_first
     loop do
       display_board(board)
-      choice = player_answer_loop(board)
-      player_place_peice!(choice, board)
-      display_board(board)
-      break if someone_won?(board) || board_full?(board)
-      computer_place_peice!(board)
+      place_pieces!(board, who_is_up(board))
       display_board(board)
       break if someone_won?(board) || board_full?(board)
     end
