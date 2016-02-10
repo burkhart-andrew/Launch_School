@@ -4,7 +4,7 @@ DECK = [
   { clubs: [:'2', :'3', :'4', :'5', :'6', :'7', :'8', :'9', :'10', :jack, :queen, :king, :ace] },
   { hearts: [:'2', :'3', :'4', :'5', :'6', :'7', :'8', :'9', :'10', :jack, :queen, :king, :ace] },
   { spades: [:'2', :'3', :'4', :'5', :'6', :'7', :'8', :'9', :'10', :jack, :queen, :king, :ace] }
-       ].freeze
+      ].freeze
 CARD_VALUES = { :'2' => 2, :'3' => 3, :'4' => 4, :'5' => 5, :'6' => 6, :'7' => 7, :'8' => 8, :'9' => 9, :'10' => 10, jack: 10, queen: 10, king: 10, ace: 0 }
 
 def prompt(message)
@@ -54,9 +54,6 @@ def deal_initial_hands!(deck, player, dealer)
   add_total_to_hand_value(dealer)
 end
 
-def add_total_hand_value!(person)
-end
-
 def ace_in_hand(person)
   total = person[:hand].map { |card| CARD_VALUES[card] }
   total = total.reduce(:+)
@@ -79,6 +76,7 @@ end
 def add_total_to_hand_value(person)
   cards_in_hand = person[:hand]
   total = cards_in_hand.map { |card| CARD_VALUES[card] }
+  binding.pry
   total = total.reduce(:+)
   if ace_in_hand(person)
     ace_in_hand(person)
@@ -87,28 +85,28 @@ def add_total_to_hand_value(person)
   end
 end
 
-def display_hand_value(player, dealer)
-prompt "#{player[:name]} has #{player[:hand_value]}. #{dealer[:name]} has #{dealer[:hand_value]}."
+def display_hand_value(player)
+  prompt "#{player[:name]} has #{player[:hand_value]}."
 end
 
 def hit!(deck, person)
   new_card = delt_card!(deck)
   person[:hand] << new_card
-  prompt "#{new_card}"
+  prompt "#{new_card.to_s.capitalize}"
+end
+
+def hit_loop(deck, person)
+  hit!(deck, person)
+  add_total_to_hand_value(person)
 end
 
 def hit_stay_loop(deck, person, dealer)
-  loop do
+  until busted?(person) || blackjack?(person, dealer) do
     prompt "Do you want to HIT or STAY?"
     hit_or_stay = gets.chomp.downcase
     if hit_or_stay.start_with?('h')
-      hit!(deck, person)
-      add_total_to_hand_value(person)
+      hit_loop(deck, person)
       prompt "You now have #{person[:hand_value]}."
-      if busted?(person) || blackjack?(person, dealer)
-        binding.pry
-        break   #not breaking when 
-      end
     elsif hit_or_stay.start_with?('s')
       break
     else
@@ -117,16 +115,12 @@ def hit_stay_loop(deck, person, dealer)
   end
 end
 
-def dealer_hit_or_stay(deck, dealer)
-  loop do
+def dealer_hit_or_stay(deck, person, dealer)
+  until busted?(dealer) || blackjack?(person, dealer) do
     if dealer[:hand_value] <= 17
       prompt "#{dealer[:name]} will hit."
-      hit!(deck, dealer)
-      add_total_to_hand_value(dealer)
+      hit_loop(deck, dealer)
       prompt "#{dealer[:name]} now has #{dealer[:hand_value]}."
-      if busted?(dealer)
-        break
-      end
     else
       prompt "Dealer will stay."
       break
@@ -135,23 +129,42 @@ def dealer_hit_or_stay(deck, dealer)
 end
 
 def busted?(person)
-  binding.pry
-  person[:hand_value] >= 22
+  if person[:hand_value] >= 22
+    return person[:name]
+  else
+    nil
+  end
+end
+
+def busted_prompt(person)
   prompt "#{person[:name]} busted!"
 end
 
 def blackjack?(player, dealer)
   if player[:hand_value] == 21
-    prompt "#{player[:name]} has a BLACKJACK! You win!"
     return player
   elsif dealer[:hand_value] == 21
-    prompt "#{dealer[:name]} has a BLACKJACK! You lose!"
     return dealer
+  else
+    nil
+  end
+end
+
+def blackjack_prompt(player, dealer)
+  case blackjack?(player, dealer)
+  when player
+    prompt "#{player[:name]} has a BLACKJACK! You win!"
+  else dealer
+    prompt "#{dealer[:name]} has a BLACKJACK! You lose!"
   end
 end
 
 def winner(player, dealer)
-  if player[:hand_value] > dealer[:hand_value]
+  if busted?(player)
+    return dealer[:name]
+  elsif busted?(dealer)
+    return player[:name]
+  elsif player[:hand_value] > dealer[:hand_value]
     return player[:name]
   else
     return dealer[:name]
@@ -168,29 +181,46 @@ end
 
 loop do
   deck = DECK
-  human = { name: "Player_1", hand: [], hand_value: 0 }
+  human = { name: "Player", hand: [], hand_value: 0 }
   computer = { name: "Dealer", hand: [], hand_value: 0 }
   system 'clear'
   loop do
     deal_initial_hands!(deck, human, computer)
-    prompt "You have: #{human[:hand][0]} and #{human[:hand][1]}."
-    prompt "Dealer has: #{computer[:hand][1]} and a unknown card."
-    display_hand_value(human, computer)
+    prompt "You have: #{human[:hand][0].to_s.capitalize} and #{human[:hand][1].to_s.capitalize}."
+    prompt "Dealer has: #{computer[:hand][1].to_s.capitalize} and a unknown card."
+    display_hand_value(human)
     if blackjack?(human, computer)
+      blackjack_prompt(human, computer)
+      winner(human, computer)
       break
     end
     hit_stay_loop(deck, human, computer)
-    if busted?(human) || blackjack?(human, computer)
+    display_hand_value(human)
+    if blackjack?(human, computer)
+      blackjack_prompt(human, computer)
+      winner(human, computer)
       break
     end
-    display_hand_value(human, computer)
-    dealer_hit_or_stay(deck, computer)
-    if busted?(computer) || blackjack?(human, computer)
+    if busted?(human)
+      busted_prompt(human)
+      winner(human, computer)
       break
     end
-    display_winner(human, computer)
+    dealer_hit_or_stay(deck, human, computer)
+    if blackjack?(human, computer)
+      blackjack_prompt(human, computer)
+      winner(human, computer)
+      break
+    end
+    if busted?(human)
+      busted_prompt(human)
+      winner(human, computer)
+      break
+    end
+    winner(human, computer)
       break
   end
+  display_winner(human, computer)
   prompt "Do you want to play again?"
   answer = gets.chomp
   break unless answer.downcase.start_with?('y')
