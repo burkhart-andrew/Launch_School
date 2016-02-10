@@ -130,9 +130,8 @@ def dealer_hit_or_stay(deck, person, dealer) # hit/stay logic for dealer
       if dealer[:hand_value] <= 17
         prompt "#{dealer[:name]} will hit."
         hit_loop(deck, dealer)
-        prompt "#{dealer[:name]} now has #{dealer[:hand_value]}."
       else
-        prompt "Dealer will stay. Dealer has #{dealer[:hand_value]}."
+        prompt "Dealer will stay at #{dealer[:hand_value]}."
         break
       end
     end
@@ -150,9 +149,9 @@ end
 def busted_prompt(player, dealer) # displays who has busted
   case busted?(player, dealer)
   when player[:name]
-    prompt "#{player[:name]} busted!"
+    prompt "#{player[:name]} busted  at #{player[:hand_value]}!"
   else dealer[:name]
-    prompt "#{dealer[:name]} busted!"
+    prompt "#{dealer[:name]} busted at #{dealer[:hand_value]}!"
   end
 end
 
@@ -207,12 +206,37 @@ def display_winner(player, dealer) # displays prompt for who wins
   end
 end
 
+def display_round(number) # displays round number
+  puts"Round #{number}"
+end
+
+def update_score(player, dealer, score) # updates scores variable
+  case winner(player, dealer)
+  when player[:name]
+    score[:human] += 1
+  when dealer[:name]
+    score[:computer] += 1
+  end
+end
+
+def display_score(player, dealer, score) # displays score to the screen
+  puts "-----------------------------------------------------"
+  puts "SCORE | Player: #{score[:human]}. Dealer: #{score[:computer]}."
+  puts "-----------------------------------------------------"
+end
+
+round = 0
+scores = {human: 0, computer: 0}
 loop do
   # game initialization
+  round += 1
+
   deck = DECK
-  human = { name: "Player", hand: [], hand_value: 0 }
+  human = { name: "Player", hand: [], hand_value: 0, }
   computer = { name: "Dealer", hand: [], hand_value: 0 }
   system 'clear'
+  display_round(round)
+  display_score(human, computer, scores)
 
   loop do
     # inital hands are delt
@@ -242,6 +266,15 @@ loop do
 
   # display winner and prompt to play again
   display_winner(human, computer)
+  update_score(human, computer, scores)
+  if scores[:human] == 5
+    prompt "Player wins it all with 5 wins!"
+    break
+  end
+  if scores[:computer] == 5
+    prompt "Dealer wins it all with 5 wins!"
+    break
+  end
   prompt "Do you want to play again?"
   answer = gets.chomp
   break unless answer.downcase.start_with?('y')
