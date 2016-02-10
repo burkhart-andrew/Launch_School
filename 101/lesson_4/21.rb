@@ -3,16 +3,13 @@ DECK = [
   { diamonds: [:'2', :'3', :'4', :'5', :'6', :'7', :'8', :'9', :'10', :jack, :queen, :king, :ace] },
   { clubs: [:'2', :'3', :'4', :'5', :'6', :'7', :'8', :'9', :'10', :jack, :queen, :king, :ace] },
   { hearts: [:'2', :'3', :'4', :'5', :'6', :'7', :'8', :'9', :'10', :jack, :queen, :king, :ace] },
-  { spades: [:'2', :'3', :'4', :'5', :'6', :'7', :'8', :'9', :'10', :jack, :queen, :king, :ace] }
-      ].freeze
-CARD_VALUES = { :'2' => 2, :'3' => 3, :'4' => 4, :'5' => 5, :'6' => 6, :'7' => 7, :'8' => 8, :'9' => 9, :'10' => 10, jack: 10, queen: 10, king: 10, ace: 0 }
+  { spades: [:'2', :'3', :'4', :'5', :'6', :'7', :'8', :'9', :'10', :jack, :queen, :king, :ace] }].freeze
+
+CARD_VALUES = { :'2' => 2, :'3' => 3, :'4' => 4, :'5' => 5, :'6' => 6, :'7' => 7, :'8' => 8, :'9' => 9, :'10' => 10, jack: 10, queen: 10, king: 10, ace: 0 }.freeze
 
 def prompt(message)
   puts "=> #{message}"
 end
-
-human = { name: "Player_1", hand: [], hand_value: 0 }
-computer = { name: "Dealer", hand: [], hand_value: 0 }
 
 def random_suit(deck) # returns a symbol representing a given suit
   suit = deck[0..3].sample
@@ -36,16 +33,16 @@ end
 def delt_card!(deck) # randomly selects a card and then removes card from the deck
   suit_name = random_suit(deck)
   suit_pos = suit_position(suit_name)
-  if deck[suit_pos][suit_name].nil?
+  if deck[suit_pos][suit_name].nil? # recursive function in situation where a suit is empty
     delt_card!(deck)
   else
     card = deck[suit_pos][suit_name].sample
-    deck[suit_pos][suit_name].delete(card)
+    deck[suit_pos][suit_name].delete(card) # delt card is deleted
     return card
   end
 end
 
-def deal_initial_hands!(deck, player, dealer)
+def deal_initial_hands!(deck, player, dealer) # deals inital hand and adds cards to player hand
   player[:hand] << delt_card!(deck)
   player[:hand] << delt_card!(deck)
   dealer[:hand] << delt_card!(deck)
@@ -54,7 +51,7 @@ def deal_initial_hands!(deck, player, dealer)
   add_total_to_hand_value(dealer)
 end
 
-def ace_in_hand(person)
+def ace_in_hand(person) # logic for determining what value ace should have depending on hand total
   total = person[:hand].map { |card| CARD_VALUES[card] }
   total = total.reduce(:+)
   if person[:hand].include?(:ace)
@@ -73,7 +70,7 @@ def ace_in_hand(person)
   end
 end
 
-def add_total_to_hand_value(person)
+def add_total_to_hand_value(person) # adds hand value to player/dealer hash
   cards_in_hand = person[:hand]
   total = cards_in_hand.map { |card| CARD_VALUES[card] }
   binding.pry
@@ -85,22 +82,41 @@ def add_total_to_hand_value(person)
   end
 end
 
-def display_hand_value(player)
+def display_hand_value(player) # display player hand total
   prompt "#{player[:name]} has #{player[:hand_value]}."
 end
 
-def hit!(deck, person)
+def hit!(deck, person) # dealing hit card and displaying it
   new_card = delt_card!(deck)
   person[:hand] << new_card
   prompt "#{new_card.to_s.capitalize}"
 end
 
-def hit_loop(deck, person)
+def hit_loop(deck, person) # main hit logic
   hit!(deck, person)
   add_total_to_hand_value(person)
 end
 
-def hit_stay_loop(deck, person, dealer)
+# def hit_stay_loop(deck, person, dealer) # hit/stay logic for player
+#   loop do
+#     if !busted?(person) || !blackjack?(person, dealer)
+#       prompt "Do you want to HIT or STAY?"
+#       hit_or_stay = gets.chomp.downcase
+#       if hit_or_stay.start_with?('h')
+#         hit_loop(deck, person)
+#         prompt "You now have #{person[:hand_value]}."
+#       elsif hit_or_stay.start_with?('s')
+#         break
+#       else
+#         prompt "Try again."
+#       end
+#     else
+#       break
+#     end
+#   end
+# end
+
+def hit_stay_loop(deck, person, dealer) # hit/stay logic for player
   until busted?(person) || blackjack?(person, dealer) do
     prompt "Do you want to HIT or STAY?"
     hit_or_stay = gets.chomp.downcase
@@ -115,7 +131,7 @@ def hit_stay_loop(deck, person, dealer)
   end
 end
 
-def dealer_hit_or_stay(deck, person, dealer)
+def dealer_hit_or_stay(deck, person, dealer) # hit/stay logic for dealer
   until busted?(dealer) || blackjack?(person, dealer) do
     if dealer[:hand_value] <= 17
       prompt "#{dealer[:name]} will hit."
@@ -128,7 +144,7 @@ def dealer_hit_or_stay(deck, person, dealer)
   end
 end
 
-def busted?(person)
+def busted?(person) # detects if someone has busted
   if person[:hand_value] >= 22
     return person[:name]
   else
@@ -136,11 +152,11 @@ def busted?(person)
   end
 end
 
-def busted_prompt(person)
+def busted_prompt(person) # displays who has busted
   prompt "#{person[:name]} busted!"
 end
 
-def blackjack?(player, dealer)
+def blackjack?(player, dealer) # detects if there is a blackjack
   if player[:hand_value] == 21
     return player
   elsif dealer[:hand_value] == 21
@@ -150,7 +166,7 @@ def blackjack?(player, dealer)
   end
 end
 
-def blackjack_prompt(player, dealer)
+def blackjack_prompt(player, dealer) # displays who has a blackjack
   case blackjack?(player, dealer)
   when player
     prompt "#{player[:name]} has a BLACKJACK! You win!"
@@ -159,7 +175,7 @@ def blackjack_prompt(player, dealer)
   end
 end
 
-def winner(player, dealer)
+def winner(player, dealer) # returns the player/dealer name
   if busted?(player)
     return dealer[:name]
   elsif busted?(dealer)
@@ -180,22 +196,30 @@ def display_winner(player, dealer)
 end
 
 loop do
+  # game initialization
   deck = DECK
   human = { name: "Player", hand: [], hand_value: 0 }
   computer = { name: "Dealer", hand: [], hand_value: 0 }
   system 'clear'
+
   loop do
+    # inital hands are delt
     deal_initial_hands!(deck, human, computer)
     prompt "You have: #{human[:hand][0].to_s.capitalize} and #{human[:hand][1].to_s.capitalize}."
     prompt "Dealer has: #{computer[:hand][1].to_s.capitalize} and a unknown card."
     display_hand_value(human)
+
+    # check to see if anyone has blackjack
     if blackjack?(human, computer)
       blackjack_prompt(human, computer)
       winner(human, computer)
       break
     end
+
+    # player hit or stay loop
     hit_stay_loop(deck, human, computer)
     display_hand_value(human)
+    # checking to see if player has blackjack or busted?
     if blackjack?(human, computer)
       blackjack_prompt(human, computer)
       winner(human, computer)
@@ -206,6 +230,8 @@ loop do
       winner(human, computer)
       break
     end
+
+    # dealer hit or stay loop
     dealer_hit_or_stay(deck, human, computer)
     if blackjack?(human, computer)
       blackjack_prompt(human, computer)
@@ -217,9 +243,13 @@ loop do
       winner(human, computer)
       break
     end
+
+    # if player and dealer both stay and don't bust or blackjack evaluate who wins
     winner(human, computer)
-      break
+    break
   end
+
+  # display winner and prompt to play again
   display_winner(human, computer)
   prompt "Do you want to play again?"
   answer = gets.chomp
@@ -228,9 +258,5 @@ end
 
 prompt "Thanks for playing 21!"
 
-# todo:
-# 1. fix game loop (play again? after a bust or blackjack)
-# 2. show hit card
-# 3.
-
-# 10 current rubocop offenses
+# to do
+# 1. in hit situation both with the dealer/player nil gets added to the hand and i get a error on line 80
