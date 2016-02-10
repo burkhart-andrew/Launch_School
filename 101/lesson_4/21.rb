@@ -94,30 +94,47 @@ def hit_loop(deck, person) # main hit logic
   add_total_to_hand_value(person)
 end
 
+def collect_response
+  prompt "Do you want to HIT or STAY?"
+  hit_or_stay = gets.chomp.downcase
+  if hit_or_stay.start_with?('h')
+    :hit
+  elsif hit_or_stay.start_with?('s')
+    :stay
+  else
+    prompt "Please type HIT or STAY."
+  end
+end
+
 def hit_stay_loop(deck, person, dealer) # hit/stay logic for player
-  until busted?(person, dealer) || blackjack?(person, dealer) do
-    prompt "Do you want to HIT or STAY?"
-    hit_or_stay = gets.chomp.downcase
-    if hit_or_stay.start_with?('h')
-      hit_loop(deck, person)
-      prompt "You now have #{person[:hand_value]}."
-    elsif hit_or_stay.start_with?('s')
+  loop do
+    if busted?(person, dealer) || blackjack?(person, dealer)
       break
     else
-      prompt "Please type HIT or STAY."
+      hit_or_stay = collect_response
+      if hit_or_stay == :hit
+        hit_loop(deck, person)
+        prompt "You now have #{person[:hand_value]}."
+      elsif hit_or_stay == :stay
+        break
+      end
     end
   end
 end
 
 def dealer_hit_or_stay(deck, person, dealer) # hit/stay logic for dealer
-  until busted?(person, dealer) || blackjack?(person, dealer) do
-    if dealer[:hand_value] <= 17
-      prompt "#{dealer[:name]} will hit."
-      hit_loop(deck, dealer)
-      prompt "#{dealer[:name]} now has #{dealer[:hand_value]}."
-    else
-      prompt "Dealer will stay. Dealer has #{dealer[:hand_value]}."
+  loop do
+    if busted?(person, dealer) || blackjack?(person, dealer)
       break
+    else
+      if dealer[:hand_value] <= 17
+        prompt "#{dealer[:name]} will hit."
+        hit_loop(deck, dealer)
+        prompt "#{dealer[:name]} now has #{dealer[:hand_value]}."
+      else
+        prompt "Dealer will stay. Dealer has #{dealer[:hand_value]}."
+        break
+      end
     end
   end
 end
