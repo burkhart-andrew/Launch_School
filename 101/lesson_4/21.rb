@@ -65,15 +65,12 @@ def ace_in_hand(person) # logic for determining what value ace should have depen
         person[:hand_value] = total
       end
     end # end for the do on 64
-  else
-    nil
   end
 end
 
 def add_total_to_hand_value(person) # adds hand value to player/dealer hash
   cards_in_hand = person[:hand]
   total = cards_in_hand.map { |card| CARD_VALUES[card] }
-  binding.pry
   total = total.reduce(:+)
   if ace_in_hand(person)
     ace_in_hand(person)
@@ -97,27 +94,8 @@ def hit_loop(deck, person) # main hit logic
   add_total_to_hand_value(person)
 end
 
-# def hit_stay_loop(deck, person, dealer) # hit/stay logic for player
-#   loop do
-#     if !busted?(person) || !blackjack?(person, dealer)
-#       prompt "Do you want to HIT or STAY?"
-#       hit_or_stay = gets.chomp.downcase
-#       if hit_or_stay.start_with?('h')
-#         hit_loop(deck, person)
-#         prompt "You now have #{person[:hand_value]}."
-#       elsif hit_or_stay.start_with?('s')
-#         break
-#       else
-#         prompt "Try again."
-#       end
-#     else
-#       break
-#     end
-#   end
-# end
-
 def hit_stay_loop(deck, person, dealer) # hit/stay logic for player
-  until busted?(person) || blackjack?(person, dealer) do
+  until busted?(person, dealer) || blackjack?(person, dealer) do
     prompt "Do you want to HIT or STAY?"
     hit_or_stay = gets.chomp.downcase
     if hit_or_stay.start_with?('h')
@@ -132,53 +110,70 @@ def hit_stay_loop(deck, person, dealer) # hit/stay logic for player
 end
 
 def dealer_hit_or_stay(deck, person, dealer) # hit/stay logic for dealer
-  until busted?(dealer) || blackjack?(person, dealer) do
+  until busted?(person, dealer) || blackjack?(person, dealer) do
     if dealer[:hand_value] <= 17
       prompt "#{dealer[:name]} will hit."
       hit_loop(deck, dealer)
       prompt "#{dealer[:name]} now has #{dealer[:hand_value]}."
     else
-      prompt "Dealer will stay."
+      prompt "Dealer will stay. Dealer has #{dealer[:hand_value]}."
       break
     end
   end
 end
 
-def busted?(person) # detects if someone has busted
-  if person[:hand_value] >= 22
-    return person[:name]
-  else
-    nil
+def busted?(player, dealer) # detects if someone has busted
+  if player[:hand_value] >= 22
+    return player[:name]
+  elsif dealer[:hand_value] >= 22
+    return dealer[:name]
   end
 end
 
-def busted_prompt(person) # displays who has busted
-  prompt "#{person[:name]} busted!"
+def busted_prompt(player, dealer) # displays who has busted
+  case busted?(player, dealer)
+  when player[:name]
+    prompt "#{player[:name]} busted!"
+  else dealer[:name]
+    prompt "#{dealer[:name]} busted!"
+  end
 end
 
 def blackjack?(player, dealer) # detects if there is a blackjack
   if player[:hand_value] == 21
-    return player
+    return player[:name]
   elsif dealer[:hand_value] == 21
-    return dealer
-  else
-    nil
+    return dealer[:name]
   end
 end
 
 def blackjack_prompt(player, dealer) # displays who has a blackjack
   case blackjack?(player, dealer)
-  when player
-    prompt "#{player[:name]} has a BLACKJACK! You win!"
-  else dealer
-    prompt "#{dealer[:name]} has a BLACKJACK! You lose!"
+  when player[:name]
+    prompt "#{player[:name]} has a BLACKJACK!"
+  else dealer[:name]
+    prompt "#{dealer[:name]} has a BLACKJACK!"
+  end
+end
+
+def check_for_bust(person, dealer)
+  if busted?(person, dealer)
+    busted_prompt(person, dealer)
+    winner(person, dealer)
+  end
+end
+
+def check_for_blackjack(player, dealer)
+  if blackjack?(player, dealer)
+    blackjack_prompt(player, dealer)
+    winner(player, dealer)
   end
 end
 
 def winner(player, dealer) # returns the player/dealer name
-  if busted?(player)
+  if player[:hand_value] > 21
     return dealer[:name]
-  elsif busted?(dealer)
+  elsif dealer[:hand_value] > 21
     return player[:name]
   elsif player[:hand_value] > dealer[:hand_value]
     return player[:name]
@@ -210,39 +205,18 @@ loop do
     display_hand_value(human)
 
     # check to see if anyone has blackjack
-    if blackjack?(human, computer)
-      blackjack_prompt(human, computer)
-      winner(human, computer)
-      break
-    end
+    break if check_for_blackjack(human, computer)
 
     # player hit or stay loop
     hit_stay_loop(deck, human, computer)
     display_hand_value(human)
+
     # checking to see if player has blackjack or busted?
-    if blackjack?(human, computer)
-      blackjack_prompt(human, computer)
-      winner(human, computer)
-      break
-    end
-    if busted?(human)
-      busted_prompt(human)
-      winner(human, computer)
-      break
-    end
+    break if check_for_blackjack(human, computer) || check_for_bust(human, computer)
 
     # dealer hit or stay loop
     dealer_hit_or_stay(deck, human, computer)
-    if blackjack?(human, computer)
-      blackjack_prompt(human, computer)
-      winner(human, computer)
-      break
-    end
-    if busted?(human)
-      busted_prompt(human)
-      winner(human, computer)
-      break
-    end
+    break if check_for_blackjack(human, computer) || check_for_bust(human, computer)
 
     # if player and dealer both stay and don't bust or blackjack evaluate who wins
     winner(human, computer)
