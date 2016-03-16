@@ -1,0 +1,62 @@
+Local Variables:
+
+N7: There are not 6 objects but 2. At the end he expresses that there are 2 objects - shaky and uncertain answer (-5).
+
+Revised N7:  There are 4 variables and only 2 objects. The two objects are `'hello'` and `'world'`. I came up with this answer by knowing variables are only pointers to physical spots in memory, they are not objects themselves. `'hello'` and `'world'` are both String objects.
+
+---
+
+Mutations:
+
+N4: The answer is imprecise and not 100% accurate. Perhaps should review the assignment on this topic. (-3).
+
+Revised N4:
+
+Line 11 outputs 'hello' because it continues to point to the same object in memory. The `change` method references the value of `greeting`. `param` is reassigned to a new object in memory on line 2 and no longer points to the same object `greeting` does. The local variable `greeting` is not mutated by the method `change` when called on line 9.
+
+---
+
+Collections:
+N1: "from each element” - its not from each element exactly. Its what each block will return. (-1)
+
+Revised N1:
+
+The Array#map method takes an array and applies a given block to each element of the array. The return of the Array#map method is an array of the returned values from the applied block.
+
+N2: its not what element evaluates to, its what block evaluates to. If the element is `1`, then its truthy, if its `false` its falsy, but block can evaluate to something else. (-3)
+
+Revised N2:  The Array#select method returns an array comprised of all the elements which returned a truthy value after the block was applied to each element.
+
+N3: Does it have to sum all the elements? Does not mention the memo (-4).
+
+Revised N3:  The Enumerable#reduce method can have mulitple functions depending on if an intial value, memo, and a block are defined. Enumerable#reduce can combine all elements of an enumerable using binary operator symbols. Enumerable#reduce can use a memo as an accumulator throughout an iteration when a block is defined. Enumerable#reduce can use an intial value as a starting point for memo.
+
+
+N5: Student has wrong conceptual understanding, because he thinks that map will take the first return value as the changed value of the element "Array#map will now take this new value for the first element of the array and make it the first element in the new array”. The old first element of the iterated array is not being changed. (-2).
+
+Revised N5:  The variable `arr` is `[false, false, true]` because Array#map will return an array with the values returned from the block. When the block was applied to the first element `1` it evaluated to false and was the returned value. Each element will evaluate to a boolean when the block is applied.
+
+---------------------------------------------------------------------
+
+Local Variables:
+
+Revised N7:  There are 4 variables and only 2 objects. The two objects are `'hello'` and `'world'`. I came up with this answer by knowing variables are only pointers to physical spots in memory, they are not objects themselves. `'hello'` and `'world'` are both String objects.
+---
+
+Mutations:
+
+Revised N4:  Line 11 outputs 'hello' because it continues to point to the same object in memory. The `change` method references the value of `greeting`. `param` is reassigned to a new object in memory on line 2 and no longer points to the same object `greeting` does. The local variable `greeting` is not mutated by the method `change` when called on line 9.
+
+---
+
+Collections:
+
+Revised N1:  The Array#map method takes an array and applies a given block to each element of the array. The return of the Array#map method is an array of the returned values from the applied block.
+
+Revised N2:  The Array#select method returns an array comprised of all the elements which returned a truthy value after the block was applied to each element.
+
+Revised N3:  The Enumerable#reduce method can have multiple functions depending on if an initial value, memo, and block are defined. Enumerable#reduce can combine all elements of an enumerable using binary operator symbols. Enumerable#reduce can apply a block to each element and then use a memo as an accumulator to hold a value between iterations. Enumerable#reduce can use an initial value as a starting point for memo.
+
+Revised N5:  The variable `arr` is `[false, false, true]` because Array#map will return an array with the values returned from the block. When the block was applied to the first element `1` it evaluated to false and was the returned value. Each element will evaluate to a boolean when the block is applied.
+
+https://launchschool.com/gists/0d3c3a69

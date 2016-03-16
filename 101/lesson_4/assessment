@@ -1,0 +1,84 @@
+# Local Variables
+
+1.
+
+The last line outputs 2 because the block reassigns `str` from `1` to the value of `2`.
+The underlying principle this example illustrates is variable scope. This example shows us that because the local variable `str` is initialized prior to the block we have access to `str` inside the block scope. We are then able to access the new value of `str` outside the block on line 8.
+
+2.
+
+The code below raises an exception because the variable `str` is intialized inside the block. `str` is therefore a variable that is contained only in the scope of the block. The method `puts` is unable to find a local variable or method by the name of `str` at the outer scope level.
+
+3.
+
+With only seeing the code snippet given one is unable to determine if line 8 will run. Line 8 will depend on whether or not the variable or method `str` is initialized in the ommited code above. The loop block will run because the variable `str` is either initialized inside the loop block or the `str` method is being reassigned inside the loop block, both instances will run succesfully. The loop block will output nothing to the console and will return nil in both instances.
+
+4.
+
+When `a_method` is called it will raise an exception because it does not have access to the outer scope where the local variable `str` is initialized.
+
+5.
+
+Line 7 outputs 'hello' because the method `puts` is calling the local variable `str` which has a value of 'hello'. The `a_method` method also has a variable witht he name of `str`. The method `a_method` will always return the value of 'world'. This code is an example of how we have a local variable and a variable inside a method with the same name but with different values.
+
+6.
+
+The local variable `b` was set to the variable `a` which had the value of 'hello'. The variable `b` is still 'hello' because it continues to point to the physcial space in memory holding the value 'hello' even though `a` was reassigned on line 3. The local variable `a` was reassigned to point to a new physical space in memory on line 3. Line 4 then mutates the value at the same physical space which held the value 'hi'. Lines 3 and 4 are changing where the variable `a` points, not where the variable `b points.
+
+7.
+
+There are four variables and 6 objects. The four variables in the code are `a`, `b`, `c`, `d`. Each variable represents one object, so there are four objects. The variables are all set to strings which are also objects, so there are an additional two objects. I believe there are only two objects as strings because the four different variables only point to two different physical spots in memory.
+
+
+# Mutating Method Arguments
+
+1.
+
+Line 8 prints 'hello' because the local variable `greeting` has the value of `hello`. The method `change` does not mutate the variable `greeting`. The method `change` takes the parameter `greeting` and concatenates it with the string ' world', it does not change the value of `greeting` when called.
+
+2.
+
+Line 8 prints 'hello world' because the local variable `greeting` was mutated by the method `change` when it was called on line 6. This code demonstrates why the method `change` is considered a destructive method. The `change` method uses a destructive method `<<` on line 2 which concatenates the string ' world' to the variable `greeting`. The `<<` method changes the value at the physical location in memory in which the variable `greeting` points to.
+
+3.
+
+Line 9 prints 'hello' because the local variable `greeting` continues to point to the physical space in memory with value 'hello'. The `change` method takes the parameter `greeting` and then reassigned it to a new physical space in memory to hold the new assignment of 'hi' on line 2, which is then mutated with `<<` on line 3. By adding the code on line 2 the `greeting` variable is now reassigned inside the `change` method essentially creating a variable scoped within the method. This allows the variable `greeting` to keep the original value of 'hello' and keeps the method `change` from mutating the caller.
+
+4.
+
+Line 11 outputs 'hello' because the local variable `greeting` continues to point to the physical space in memory with the value 'hello'. The `change` method does not mutate the caller. The `change` method takes a parameter and then reassigns it inside the scope of the method. This demonstrates how Ruby can sometimes be considered Pass by Value. The value of the variable `greeting` is getting passed into the method `change`. 
+
+# Working with Collections
+
+1.
+
+The Array#map method takes each element of the given array and then passes that element into the block once. A new array will be returned with the new values from each element after being evaluated in the block. The Array#map method does not mutuate the original values of the array.
+
+2.
+
+The Array#select method takes each element of the given array and then passes that element into the block once. A new array will be returned with only the original array elements that evaluated true when passed into the given block. Elements that evaluated to a falsey value will not be included in the new returned array. The Array#select method does not mutuate the original values of the array.
+
+3.
+
+The Enumerable#reduce method 
+
+4.
+
+Both of the lines of code return an array containing the same elements because map returns an array with the new values of the elements after they have been evaluated in the block. The code on line 1 is adding a value of 1 to each element in the array. The code on line 2 is reassigning each element to its current value plus 1. I would prefer the second line of code because
+
+5.
+
+The resulting `arr` is an array of booleans because Array#map will always return an array with all of the elements with the new corresponding value after being passed into the block.
+
+6.
+
+
+The `arr` changed into `[nil, nil, nil]` because each element was output using the method `puts`, which has a return value of `nil`. The Array#map method will return a new array with all of the returned values for each element after it is passed into the block.
+
+7.
+
+`arr` is now `[1, 2, 3]` because each element evaluated to a true value after being passed into the block. Array#select will return a new array containing the elements that returned a true value when passed into the block.
+
+8.
+
+`arr` is now an empty array `[]` because the method `puts` returns the value `nil` which has a false value. Array#select will not select any of the elements because each element of the array returned the value `nil` which represents a false value.
