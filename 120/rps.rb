@@ -1,5 +1,5 @@
 # rps.rb
-
+require 'pry'
 class Move
   VALUES = ['rock', 'paper', 'scissors']
 
@@ -37,10 +37,11 @@ class Move
 end
 
 class Player
-  attr_accessor :move, :name
+  attr_accessor :move, :name, :score
 
   def initialize
     set_name
+    @score = 0
   end
 end
 
@@ -99,13 +100,37 @@ class RPSGame
     puts "#{computer.name} chose #{computer.move}"
   end
 
-  def display_winner
+  def winner?
     if human.move > computer.move
-      puts "#{human.name} won!"
+      :human
     elsif human.move < computer.move
-      puts "#{computer.name} won!"
+      :computer
     else
+      :tie
+    end
+  end
+
+  def display_winner
+    if winner? == :human
+      puts "#{human.name} won!"
+    elsif winner? == :computer
+      puts "#{computer.name} won!"
+    else winner? == :tie
       puts "It's a tie!"
+    end
+  end
+
+  def display_score
+    puts "#{human.name} Score: #{human.score} #{computer.name} Score: #{computer.score}"
+  end
+
+  def update_score
+    if winner? == :human
+      human.score =+ 1
+    elsif winner? == :computer
+      computer.score =+ 1
+    else
+      nil
     end
   end
 
@@ -129,6 +154,9 @@ class RPSGame
       @computer.choose
       display_moves
       display_winner
+      update_score
+      display_score
+      binding.pry
       break unless play_again?
     end
     display_goodbye_message
